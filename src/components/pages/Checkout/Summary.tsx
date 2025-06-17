@@ -69,7 +69,7 @@ const Summary: React.FC = function () {
         }
       >
         {navigation.state === 'submitting' && <Loading />}
-        check & pay
+        Continue & Pay
       </Button>
     </div>
   )

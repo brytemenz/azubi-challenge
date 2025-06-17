@@ -11,7 +11,7 @@ const Homepage: React.FC = function () {
     <div className="homepage">
       <section className="hero-section">
         <div className="container">
-          <h1>XX99 Mark II Headphones</h1>
+          <h1>XX99 MARK II HEADPHONES</h1>
           <p>NEW PRODUCT</p>
           <p>
             Experience natural, lifelike audio and exceptional build quality
