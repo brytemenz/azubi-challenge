@@ -73,11 +73,11 @@ app.post('/create-order', async (req, res) => {
     console.log(`💳 Payment method: ${paymentMethod}`);
     if (paymentMethod === 'e-money') {
       console.log(`🔢 e-Money number: ${eMoneyNumber}`);
-      // In a real app, you would process the e-money payment here
+      // Simulated process the e-money payment 
       console.log('✅ Simulated e-Money payment processed');
     }
 
-    const successUrl = `${process.env.SERVER_URL || 'http://localhost:5173'}/checkout?ordersuccess=true&orderNumber=${orderNumber}`;
+    const successUrl = `${process.env.SERVER_URL || 'azubi-tmp.netlify.app'}/checkout?ordersuccess=true&orderNumber=${orderNumber}`;
 
     res.json({
       url: successUrl,
