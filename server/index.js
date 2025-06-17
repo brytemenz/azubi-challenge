@@ -9,18 +9,12 @@ app.use(
   cors({
     origin: [
       'http://127.0.0.1:5173',
-      'https://gleeful-medovik-88e4a5.netlify.app',
+      'https://azubi-tmp.netlify.app/',
     ],
     methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
   })
 )
-
-const stripe = require('stripe')(process.env.STRIPE_KEY)
-const { Client, resources, Webhook } = require('coinbase-commerce-node')
-
-Client.init(process.env.COINBASE_KEY)
-const { Charge } = resources
 
 const calculateTotal = function (items) {
   const prices = items.map(item => ({
@@ -43,69 +37,40 @@ const storeItems = new Map([
 ])
 
 app.post('/create-checkout', async (req, res) => {
+  const { items, userName, paymentMethod } = req.body
+
+  if (!items || !paymentMethod || !userName) {
+    return res.status(400).json({ error: 'Missing required fields' })
+  }
+
   try {
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      mode: 'payment',
-      line_items: req.body.items.map(item => {
-        const storeItem = storeItems.get(item.id)
-        return {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: storeItem.name,
-            },
-            unit_amount: storeItem.priceInCents,
-          },
-          quantity: item.quantity,
-        }
-      }),
-      success_url: `${process.env.SERVER_URL}/checkout?ordersuccess=true`,
-      cancel_url: `${process.env.SERVER_URL}/checkout?ordersuccess=false`,
+    const orderSummary = items.map(item => {
+      const storeItem = storeItems.get(item.id)
+      return {
+        name: storeItem.name,
+        quantity: item.quantity,
+        price: storeItem.priceInCents,
+      }
     })
-    res.json({ url: session.url })
+
+    const total = calculateTotal(
+      orderSummary.map(item => ({
+        price: item.price.toString(),
+        count: item.quantity,
+      }))
+    )
+
+    console.log(`Order from ${userName} using ${paymentMethod}`)
+    console.log('Order details:', orderSummary)
+    console.log('Total amount:', total)
+
+    const successUrl = `${process.env.SERVER_URL}/checkout?ordersuccess=true`
+    res.json({ url: successUrl })
   } catch (e) {
     res.status(500).json({ error: e.message })
   }
 })
-app.get('/create-charge', async (req, res) => {
-  const orders = JSON.parse(req.query.params)
-  const userName = req.query.userName
 
-  try {
-    const chargeData = {
-      name: orders
-        .map(val => {
-          return val.name
-        })
-        .join(', '),
-      description: 'Audiophile equipments',
-      local_price: {
-        amount: calculateTotal(orders),
-        currency: 'USD',
-      },
-      pricing_type: 'fixed_price',
-      metadata: {
-        user: userName,
-      },
-    }
-    const charge = await Charge.create(chargeData)
-    res.send(charge)
-  } catch (err) {
-    res.status(400).send(err.message)
-  }
+app.listen(3000, () => {
+  console.log('✅ Mock checkout server running on port 3000')
 })
-app.get('/webhooks', async (req, res) => {
-  const rawBody = req.rawBody
-  const signature = req.headers['x-cc-webhook-signature']
-  const webhookSecret = process.env.WEBHOOK_SECRET
-
-  try {
-    const event = Webhook.verifyEventBody(rawBody, signature, webhookSecret)
-    res.send(`success ${event.id}`)
-  } catch (err) {
-    res.status(400).send('failure!')
-  }
-})
-
-app.listen(3000)
