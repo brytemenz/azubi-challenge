@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import errorImg from '../../assets/error/Ilustration.svg';
+import errorImg from '../../assets/error/not-found.svg';
 import backArrow from '../../assets/error/Icon.svg';
 import '../../sass/pages/page_not_found.scss';
 
