@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'https://azubi-tmp.netlify.app'],
+    origin: ['http://localhost:5173', 'https://tmp-e-commerce.vercel.app'],
     methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
   })
@@ -77,7 +77,7 @@ app.post('/create-order', async (req, res) => {
       console.log('✅ Simulated e-Money payment processed');
     }
 
-   const successUrl = `${process.env.SERVER_URL || 'https://azubi-tmp.netlify.app'}/checkout?ordersuccess=true&orderNumber=${orderNumber}`;
+   const successUrl = `${process.env.SERVER_URL || 'https://tmp-e-commerce.vercel.app'}/checkout?ordersuccess=true&orderNumber=${orderNumber}`;
 
     res.json({
       url: successUrl,
