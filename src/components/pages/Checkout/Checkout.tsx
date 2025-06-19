@@ -47,7 +47,7 @@ export const checkoutAction = async function ({ request }: { request: Request })
   }
 
   try {
-    const res = await fetch('https://azubi-assesment-w8cm.vercel.app/create-order', {
+    const res = await fetch('https://azubi-challenge.vercel.app/create-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
